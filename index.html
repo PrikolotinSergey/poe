@@ -1,111 +1,141 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Poe Calculator</title>
-	<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" language="JavaScript"></script>
-	<style type="text/css">
-		.row > *
-		{
-			display: inline-block;
-			width:40px;
-			text-align: center;
-			margin: 0 !important;
-		}
-		.no,.yes
-		{
-			display: inline-block;
-			padding-right: 5px;
-			padding-left: 5px;
-			padding-top: 2px;
-			padding-bottom: 2px;
-		}
-		.no
-		{
-			background-color: #FFC7CE;
-			color: #9C0006;
-		}
-		.yes
-		{
-			background-color: #C6EFCE;
-			color: #006145;
-		}
-	</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Poe Calculator</title>
+    <script src="jquery-3.7.1.slim.min.js" language="JavaScript"></script>
+    <style type="text/css">
+    .row>* {
+        display: inline-block;
+        width: 35px;
+        text-align: center;
+        margin: 0 !important;
+    }
+
+    .no,
+    .yes {
+        font-family: Helvetica, sans serif;
+        display: inline-block;
+        padding-right: 5px;
+        position: relative;
+    }
+
+    .no {
+        background-color: #F2F2F2;
+        color: #3F3F3F;
+    }
+
+    .yes {
+        background-color: #FFEB9C;
+        color: #9C5700;
+    }
+
+    .yes:before,
+    .no:before {
+        display: inline-block;
+        padding: 5px;
+        margin-right: 5px;
+    }
+
+    .yes:before {
+        content: '💡';
+        background: #F7B300;
+    }
+
+    .no:before {
+        content: '╳';
+        color: gray;
+        background: #E6E6E6;
+    }
+
+    #result {
+        padding: 10px;
+        border: 1px solid gray;
+        border-radius: 10px;
+        display: inline-block;
+        margin: 10px;
+    }
+
+    #data {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    </style>
 </head>
+
 <body>
-	<label for="scheme">Power off scheme: </label>
-	<select id="scheme">
-		<option value="a">A</option>
-		<option value="b">B</option>
-		<option value="c">C</option>
-	</select>
-	<div class="row">
-		<span>00</span><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span>
-	</div>
-	<div id="data"></div>
-	<button id=add>Add</button>
-	<div id="result"></div>
-	<script type="text/javascript">
-		var plans = {
-			"a" : [parseInt("111101111101111101111101",2), parseInt("111100111100111100111100",2), parseInt("111100011100011100011100",2)],
-			"b" : [parseInt("111111011111011111011111",2), parseInt("111111001111001111001111",2), parseInt("111111000111000111000111",2)],
-			"c" : [parseInt("000111110111110111110111",2), parseInt("000011110011110011110011",2), parseInt("000001110001110001110001",2)],
-		}
-		//var c = [parseInt("000111110111110111110111",2), parseInt("000011110011110011110011",2), parseInt("000001110001110001110001",2)];
-		function Invalidate() 
-		{
-			var res = Number(0);
-			var c = plans[$("#scheme").val()];
-			console.log($("#scheme").val());
-			$("#data").children(".row").each(function()
-			{
-				var mask = Number(0);
-				$.each($(this).find("input[type='checkbox']:checked"), function(){
-					mask = mask | 1 << (24-Number($(this).val()));
-				});
-				
-				res = res | (c[Number($(this).find("select").val())] & mask);
-			});
-			res = res.toString(2).padStart(24,'0');
-			
-			var output = "";
-			var prev = -1;
-			for (var i = 0; i < 24; ++i) 
-			{
-				if (prev != res[i])
-				{
-					if (prev != -1)
-						output += i.toString().padStart(2,'0') + ":00</span><br>"
-					output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2,'0') + ":00 - ";
-					prev = res[i];
-				}
-				//output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2,'0') + ":00 - " + (i + 1).toString().padStart(2,'0') + ":00</span><br>";
-			}
-			output += i.toString().padStart(2,'0') + ":00</span><br>"
-			$("#result").html(output);
-		}
-		$("#add").click(function()
-		{
-			var values = parseInt("1111111111111111111111111", 2);
-			$.each($("#data input[type='checkbox']:checked"), function(){
-				values = values & ~(1 << (24-Number($(this).val())));
-			});
-			values = values.toString(2).padStart(25,'0');
-			
-			$("#data").append("<div class=\"row\"></div>");
+    <label for="scheme">Power off scheme: </label>
+    <select id="scheme">
+        <option value="a">A</option>
+        <option value="b">B</option>
+        <option value="c">C</option>
+    </select>
+    <div id="data">
+        <div class="row">
+            <span>00</span><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span>
+        </div>
+    </div>
+    <button id=add>Add</button>
+    <div>
+        <div id="result"></div>
+    </div>
+    <script type="text/javascript">
+    var plans = {
+        "a": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2)],
+        "b": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("111111000111000111000111", 2)],
+        "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2)],
+    }
 
-			var item = $("#data>div:last-child")
-			for (var i = 0; i <= 24; ++i) 
-			{
-				$("<input type=\"checkbox\" value=\""+i+"\" "+ (values[i] == '1' ? "checked=\"checked\"" : "") +">").appendTo(item);
-			}
-			$("<select id=\"plan\"><option value=\"0\">1</option><option value=\"1\">2</option><option value=\"2\">3</option></select>").appendTo(item);
+    function Invalidate() {
+        var res = Number(0);
+        var c = plans[$("#scheme").val()];
+        console.log($("#scheme").val());
+        $("#data").children(".row").each(function() {
+            var mask = Number(0);
+            $.each($(this).find("input[type='checkbox']:checked"), function() {
+                mask = mask | 1 << (24 - Number($(this).val()));
+            });
 
-			$(":checkbox").change(Invalidate);
-			$("select").change(Invalidate);
-			Invalidate();
-		});
-	</script>
+            res = res | (c[Number($(this).find("select").val())] & mask);
+        });
+        res = res.toString(2).padStart(24, '0');
+
+        var output = "";
+        var prev = -1;
+        for (var i = 0; i < 24; ++i) {
+            if (prev != res[i]) {
+                if (prev != -1)
+                    output += i.toString().padStart(2, '0') + ":00</span><br>"
+                output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2, '0') + ":00 - ";
+                prev = res[i];
+            }
+            //output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2,'0') + ":00 - " + (i + 1).toString().padStart(2,'0') + ":00</span><br>";
+        }
+        output += i.toString().padStart(2, '0') + ":00</span><br>"
+        $("#result").html(output);
+    }
+    $("#add").click(function() {
+        var values = parseInt("1111111111111111111111111", 2);
+        $.each($("#data input[type='checkbox']:checked"), function() {
+            values = values & ~(1 << (24 - Number($(this).val())));
+        });
+        values = values.toString(2).padStart(25, '0');
+
+        $("#data").append("<div class=\"row\"></div>");
+
+        var item = $("#data>div:last-child")
+        for (var i = 0; i <= 24; ++i) {
+            $("<input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + ">").appendTo(item);
+        }
+        $("<select id=\"plan\"><option value=\"0\">1</option><option value=\"1\">2</option><option value=\"2\">3</option></select>").appendTo(item);
+
+        $(":checkbox").change(Invalidate);
+        $("select").change(Invalidate);
+        Invalidate();
+    });
+    </script>
 </body>
+
 </html>
