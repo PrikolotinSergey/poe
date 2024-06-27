@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Poe Calculator</title>
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" language="JavaScript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" integrity="sha512-01CJ9/g7e8cUmY0DFTMcUw/ikS799FHiOA0eyHsUWfOetgbx/t6oV4otQ5zXKQyIrQGTHSmRVPIgrgLcZi/WMA==" crossorigin="anonymous"></script>
     <style type="text/css">
     .row>* {
         display: inline-block;
@@ -52,12 +53,22 @@
         background: #D3D3D5;
     }
 
+    .resultContainer {
+        margin: 10px;
+    }
+
+    .resultContainer div {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .resultContainer span {
+        display: inline-block;
+        width: 140px;
+    }
+
     #result {
         padding: 10px;
-        border: 1px solid gray;
-        border-radius: 10px;
-        display: inline-block;
-        margin: 10px;
     }
 
     #data {
@@ -80,8 +91,9 @@
         </div>
     </div>
     <button id=add>Add</button>
-    <div>
+    <div class="resultContainer">
         <div id="result"></div>
+        <div id="resultImg"></div>
     </div>
     <script type="text/javascript">
     var plans = {
@@ -117,6 +129,12 @@
         }
         output += i.toString().padStart(2, '0') + ":00</span><br>"
         $("#result").html(output);
+
+        domtoimage.toSvg($("#result").get(0)).then((dataUrl) => {
+            const img = new Image();
+            img.src = dataUrl;
+            $("#resultImg").get(0).appendChild(img);
+        });
     }
     $("#add").click(function() {
         var values = parseInt("1111111111111111111111111", 2);
