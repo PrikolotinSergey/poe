@@ -6,14 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Poe Calculator</title>
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" language="JavaScript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" integrity="sha512-01CJ9/g7e8cUmY0DFTMcUw/ikS799FHiOA0eyHsUWfOetgbx/t6oV4otQ5zXKQyIrQGTHSmRVPIgrgLcZi/WMA==" crossorigin="anonymous"></script>
     <style type="text/css">
-    .row>* {
-        display: inline-block;
-        width: 35px;
-        text-align: center;
-        margin: 0 !important;
-    }
-
     .no,
     .yes {
         font-family: Helvetica, sans serif;
@@ -70,9 +64,56 @@
         padding: 10px;
     }
 
-    #data {
-        overflow-x: auto;
-        white-space: nowrap;
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 32px;
+        height: 24px;
+        margin: 3px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+
+    .checkbox {
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        display: inline-block;
+        vertical-align: middle;
+        box-sizing: border-box;
+        justify-content: center;
+        width: 32px;
+        line-height: 24px;
+        border-radius: 8px;
+        font-family: Helvetica, sans serif;
+        font-size: 10pt;
+        border: 1.5px solid none;
+        text-align: center;
+    }
+
+    input:checked+.checkbox {
+        color: #007AFF;
+        background: #F2F2F7;
+        border: 1.5px solid #007AFF;
+    }
+
+    .row {
+        flex-direction: row;
+        background-color: #EEEEEF;
+        border-radius: 11px;
+        padding: 2px;
+        margin: 5px;
+    }
+
+    .row select {
+        margin: 3px;
     }
     </style>
 </head>
@@ -85,19 +126,17 @@
         <option value="c">C</option>
     </select>
     <div id="data">
-        <div class="row">
-            <span>00</span><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span>
-        </div>
     </div>
     <button id=add>Add</button>
-    <div class="resultContainer">    
+    <div class="resultContainer">
         <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
             <g>
                 <foreignobject id="container" width="1px" height="1px" class="node">
-                    <div id="result"></div>                
+                    <div id="result"></div>
                 </foreignobject>
             </g>
         </svg>
+        <img id="image" />
     </div>
     <script type="text/javascript">
     var plans = {
@@ -107,16 +146,15 @@
     }
 
     function Invalidate() {
-        var res = Number(0);
+        var res = parseInt("111111111111111111111111", 2);
         var c = plans[$("#scheme").val()];
-        console.log($("#scheme").val());
+
         $("#data").children(".row").each(function() {
             var mask = Number(0);
             $.each($(this).find("input[type='checkbox']:checked"), function() {
-                mask = mask | 1 << (24 - Number($(this).val()));
+                mask = mask | 1 << (23 - Number($(this).val()));
             });
-
-            res = res | (c[Number($(this).find("select").val())] & mask);
+            res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
         });
         res = res.toString(2).padStart(24, '0');
 
@@ -154,10 +192,10 @@
         $("#data").append("<div class=\"row\"></div>");
 
         var item = $("#data>div:last-child")
-        for (var i = 0; i <= 24; ++i) {
-            $("<input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + ">").appendTo(item);
-        }
         $("<select id=\"plan\"><option value=\"0\">1</option><option value=\"1\">2</option><option value=\"2\">3</option></select>").appendTo(item);
+        for (var i = 0; i < 24; ++i) {
+            $("<label class=\"switch\"><input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + "><span class=\"checkbox\">" + i.toString().padStart(2, '0') + "</span></label>").appendTo(item);
+        }
 
         $(":checkbox").change(Invalidate);
         $("select").change(Invalidate);
