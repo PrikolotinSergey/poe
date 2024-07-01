@@ -48,6 +48,15 @@
 
     .resultContainer {
         margin: 10px;
+        display: grid;
+        gap: 40px;
+        grid-template-columns: 140px 140px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: Helvetica, sans serif;
+        font-size: 12pt;
     }
 
     .resultContainer div {
@@ -129,58 +138,68 @@
     </div>
     <button id=add>Add</button>
     <div class="resultContainer">
-        <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+        <!--         <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
             <g>
                 <foreignobject id="container" width="1px" height="1px" class="node">
                     <div id="result"></div>
                 </foreignobject>
             </g>
         </svg>
-        <img id="image" />
+        <img id="image" /> -->
     </div>
     <script type="text/javascript">
-    var plans = {
+    var plans = [{
+        "title": "1",
+        "a": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2)],
+        "b": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2)],
+        "c": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2)],
+    }, {
+        "title": "3",
         "a": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2)],
         "b": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("111111000111000111000111", 2)],
         "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2)],
-    }
+    }];
 
     function Invalidate() {
-        var res = parseInt("111111111111111111111111", 2);
-        var c = plans[$("#scheme").val()];
-
-        $("#data").children(".row").each(function() {
-            var mask = Number(0);
-            $.each($(this).find("input[type='checkbox']:checked"), function() {
-                mask = mask | 1 << (23 - Number($(this).val()));
-            });
-            res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
-        });
-        res = res.toString(2).padStart(24, '0');
 
         var output = "";
-        var prev = -1;
-        for (var i = 0; i < 24; ++i) {
-            if (prev != res[i]) {
-                if (prev != -1)
-                    output += i.toString().padStart(2, '0') + ":00</span><br>"
-                output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2, '0') + ":00 - ";
-                prev = res[i];
+        for (var q = 0; q < 2; q++) {
+            output += "<div><h1>" + plans[q]["title"] + "</h1>";
+            var res = parseInt("111111111111111111111111", 2);
+            var c = plans[q][$("#scheme").val()];
+
+            $("#data").children(".row").each(function() {
+                var mask = Number(0);
+                $.each($(this).find("input[type='checkbox']:checked"), function() {
+                    mask = mask | 1 << (23 - Number($(this).val()));
+                });
+                res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
+            });
+            res = res.toString(2).padStart(24, '0');
+            var prev = -1;
+            for (var i = 0; i < 24; ++i) {
+                if (prev != res[i]) {
+                    if (prev != -1)
+                        output += i.toString().padStart(2, '0') + ":00</span><br>"
+                    output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2, '0') + ":00 - ";
+                    prev = res[i];
+                }
+                //output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2,'0') + ":00 - " + (i + 1).toString().padStart(2,'0') + ":00</span><br>";
             }
-            //output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2,'0') + ":00 - " + (i + 1).toString().padStart(2,'0') + ":00</span><br>";
+            output += i.toString().padStart(2, '0') + ":00</span></div>";
         }
-        output += i.toString().padStart(2, '0') + ":00</span><br>"
-        $("#result").html(output);
 
-        var content = document.getElementById("result");
-        var container = document.getElementById('container');
-        container.setAttribute("height", content.scrollHeight + "px");
-        container.setAttribute("width", content.scrollWidth + "px");
+        $(".resultContainer").html(output);
 
-        var svg = document.querySelector('svg');
-        var bbox = svg.firstElementChild.getBBox();
-        svg.setAttribute("height", bbox.height + "px");
-        svg.setAttribute("width", bbox.width + "px");
+        // var content = document.getElementById("result");
+        // var container = document.getElementById('container');
+        // container.setAttribute("height", content.scrollHeight + "px");
+        // container.setAttribute("width", content.scrollWidth + "px");
+
+        // var svg = document.querySelector('svg');
+        // var bbox = svg.firstElementChild.getBBox();
+        // svg.setAttribute("height", bbox.height + "px");
+        // svg.setAttribute("width", bbox.width + "px");
     }
     $("#add").click(function() {
         var values = parseInt("1111111111111111111111111", 2);
