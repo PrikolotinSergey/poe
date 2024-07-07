@@ -143,14 +143,14 @@
     <script type="text/javascript">
     var plans = [{
         "title": "1",
-        "a": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2)],
-        "b": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2)],
-        "c": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2)],
+        "a": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2), parseInt("000000110000110000110001", 2)],
+        "b": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2), parseInt("111100001100001100001100", 2)],
+        "c": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2), parseInt("000011000110000110000011", 2)],
     }, {
         "title": "3",
-        "a": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2)],
-        "b": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("111111000111000111000111", 2)],
-        "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2)],
+        "a": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2), parseInt("111100001100001100001100", 2)],
+        "b": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("111111000111000111000111", 2), parseInt("111111000011000011000011", 2)],
+        "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("000001110001110001110001", 2), parseInt("000000110000110000110000", 2)],
     }];
 
     function Invalidate() {
@@ -193,7 +193,7 @@
         $("#data").append("<div class=\"row\"></div>");
 
         var item = $("#data>div:last-child")
-        $("<select id=\"plan\"><option value=\"0\">1</option><option value=\"1\">2</option><option value=\"2\">3</option></select>").appendTo(item);
+        $("<select id=\"plan\"><option value=\"0\">1</option><option value=\"1\">2</option><option value=\"2\">3</option><option value=\"3\">4</option></select>").appendTo(item);
         for (var i = 0; i < 24; ++i) {
             $("<label class=\"switch\"><input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + "><span class=\"checkbox\">" + i.toString().padStart(2, '0') + "</span></label>").appendTo(item);
         }
