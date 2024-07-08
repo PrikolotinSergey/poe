@@ -5,12 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Poe Calculator</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" language="JavaScript"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" language="JavaScript"></script>
     <style type="text/css">
+    body {
+
+        font-family: Helvetica, sans serif;
+    }
 
     .no,
     .yes {
-        font-family: Helvetica, sans serif;
         display: inline-block;
         padding-right: 5px;
         position: relative;
@@ -47,7 +50,7 @@
     }
 
     .resultContainer {
-        margin: 10px;
+        margin: 10px 10px 50px 10px;
         display: grid;
         gap: 40px;
         grid-template-columns: 130px 130px;
@@ -55,7 +58,6 @@
 
     h1 {
         text-align: center;
-        font-family: Helvetica, sans serif;
         font-size: 12pt;
     }
 
@@ -101,8 +103,6 @@
         width: 32px;
         line-height: 24px;
         border-radius: 8px;
-        font-family: Helvetica, sans serif;
-        font-size: 10pt;
         border: 1.5px solid none;
         text-align: center;
     }
@@ -124,11 +124,39 @@
     .row select {
         margin: 3px;
     }
-    
+
+    #data {
+        font-size: 10pt;
+    }
+
+    .gpvTable {
+        background-color: #EEEEEF;
+        border-radius: 11px;
+        padding: 2px;
+        margin: 5px;
+        display: table;
+    }
+
+    .gpvTable>div {
+        display: table-row;
+    }
+
+    .gpvTable span {
+        display: table-cell;
+        padding: 5px;
+    }
+
+    .gpvTable>b {
+        display: table-row;
+        text-align: center;
+    }
     </style>
 </head>
 
 <body>
+    <label for="getGPVToday">Get GPV for </label>
+    <button id="getGPVToday">Today</button>
+    <button id="getGPVTomorrow">Tomorrow</button>
     <label for="scheme">Power off scheme: </label>
     <select id="scheme">
         <option value="a">A</option>
@@ -190,18 +218,75 @@
         });
         values = values.toString(2).padStart(25, '0');
 
-        $("#data").append("<div class=\"row\"></div>");
-
-        var item = $("#data>div:last-child")
-        $("<select id=\"plan\"><option value=\"0\">1</option><option value=\"1\">2</option><option value=\"2\">3</option><option value=\"3\">4</option></select>").appendTo(item);
-        for (var i = 0; i < 24; ++i) {
-            $("<label class=\"switch\"><input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + "><span class=\"checkbox\">" + i.toString().padStart(2, '0') + "</span></label>").appendTo(item);
-        }
-
+        addRow(0, values);
         $(":checkbox").change(Invalidate);
         $("select").change(Invalidate);
         Invalidate();
     });
+
+    function addRow(plan, values) {
+        $("#data").append("<div class=\"row\"></div>");
+
+        var item = $("#data>div:last-child")
+        var options = "";
+        for (var i = 0; i < 4; ++i) {
+            options += "<option value=\"" + i + "\"" + (plan != i ? "" : "selected=\"selected\"") + ">" + (i + 1) + "</option>";
+        }
+        $("<select id=\"plan\">" + options + "</select>").appendTo(item);
+        for (var i = 0; i < 24; ++i) {
+            $("<label class=\"switch\"><input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + "><span class=\"checkbox\">" + i.toString().padStart(2, '0') + "</span></label>").appendTo(item);
+        }
+    }
+    $("#getGPVToday").click(function() {
+        GetGPVForDate(new Date());
+    });
+    $("#getGPVTomorrow").click(function() {
+        GetGPVForDate(new Date().addDays(1));
+    });
+    Date.prototype.addDays = function(days) {
+        const date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    };
+
+    function GetGPVForDate(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        var datainfo = {
+            "date_in": day + "-" + month + "-" + year
+        };
+
+        $.ajax({
+            url: "https://www.poe.pl.ua/customs/newgpv-info.php",
+            type: "post",
+            dataType: "json",
+            data: { "seldate": JSON.stringify(datainfo) },
+            complete: function(data) {
+                if (data.responseText) {
+                    $("#data").html("<div class=\"gpvTable\"><b>" + day + "." + month + "." + year + "</b></div>");
+                    const regexp = /<b>з ([\d]{2}):([\d]{2}) по ([\d]{2}):([\d]{2})<\/b>[^<]+<a[^>]+href="https:\/\/www.poe.pl.ua\/files\/gpv\/gpv([A-Z])(\d)/g;
+                    const array = [...data.responseText.matchAll(regexp)];
+                    for (var i = 0; i < array.length; i++) {
+                        var start = Number(array[i][1]) + Math.min(Number(array[i][2]), 1);
+                        var end = Number(array[i][3]) + Math.min(Number(array[i][4]), 1);
+                        var values = "1".repeat(end - start).padStart(end, "0").padEnd(24, "0");
+
+                        addRow(Number(array[i][6]) - 1, values);
+                        $(".gpvTable").append("<div><span>" + array[i][1] + ":" + array[i][2] + " - " + array[i][3] + ":" + array[i][4] + "</span><span>" + array[i][5] + array[i][6] + "</span></div>");
+
+                    }
+                    $("#scheme").val(array[0][5].toLowerCase());
+                    $(":checkbox").change(Invalidate);
+                    $("select").change(Invalidate);
+                    Invalidate();
+                } else {
+                    $("#data").html("<div class=\"gpvTable\"><b>Data is not available</b></div>");
+                }
+            }
+        });
+    }
     </script>
 </body>
 
