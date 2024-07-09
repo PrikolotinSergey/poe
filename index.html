@@ -38,6 +38,29 @@
         width: 28px;
     }
 
+    .yes:after,
+    .no:after {
+        display: inline-block;
+        text-align: center;
+        width: 28px;
+        line-height: 32px;
+        position: absolute;
+        right: 0;
+        content: attr(data-count);
+    }
+
+    .yes:after {
+        background: #FFECD0;
+        color: #DF9500;
+        border-left: 1px solid #DF9500;
+    }
+
+    .no:after {
+        color: #79797E;
+        background: #EFEFF2;
+        border-left: 1px solid #A9A9AE;
+    }
+
     .yes:before {
         content: '💡';
         background: #FF9500;
@@ -53,7 +76,7 @@
         margin: 10px 10px 50px 10px;
         display: grid;
         gap: 40px;
-        grid-template-columns: 130px 130px;
+        grid-template-columns: 155px 155px;
     }
 
     h1 {
@@ -68,7 +91,7 @@
 
     .resultContainer span {
         display: inline-block;
-        width: 130px;
+        width: 155px;
     }
 
     #result {
@@ -198,15 +221,20 @@
             });
             res = res.toString(2).padStart(24, '0');
             var prev = -1;
-            for (var i = 0; i < 24; ++i) {
+            var line = "";
+            var n = 0;
+            for (var i = 0; i < 24; ++i, ++n) {
                 if (prev != res[i]) {
-                    if (prev != -1)
-                        output += i.toString().padStart(2, '0') + ":00</span><br>"
-                    output += "<span class=\"" + (res[i] == '1' ? "yes" : "no") + "\">" + i.toString().padStart(2, '0') + ":00 - ";
+                    if (prev != -1) {
+                        line += i.toString().padStart(2, '0') + ":00";
+                        output += "<span class=\"" + (prev == '1' ? "yes" : "no") + "\" data-count=\"" + n + "\">" + line + "</span><br>";
+                        n = 0;
+                    }
+                    line = i.toString().padStart(2, '0') + ":00 - ";
                     prev = res[i];
                 }
             }
-            output += i.toString().padStart(2, '0') + ":00</span></div>";
+            output += "<span class=\"" + (prev == '1' ? "yes" : "no") + "\" data-count=\"" + n + "\">" + line + i.toString().padStart(2, '0') + ":00</span><br>";
         }
 
         $(".resultContainer").html(output);
