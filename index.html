@@ -234,7 +234,7 @@
                     prev = res[i];
                 }
             }
-            output += "<span class=\"" + (prev == '1' ? "yes" : "no") + "\" data-count=\"" + n + "\">" + line + i.toString().padStart(2, '0') + ":00</span><br>";
+            output += "<span class=\"" + (prev == '1' ? "yes" : "no") + "\" data-count=\"" + n + "\">" + line + i.toString().padStart(2, '0') + ":00</span></div>";
         }
 
         $(".resultContainer").html(output);
