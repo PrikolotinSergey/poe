@@ -75,13 +75,17 @@
     .resultContainer {
         margin: 10px 10px 50px 10px;
         display: grid;
-        gap: 40px;
+        gap: 25px;
         grid-template-columns: 155px 155px;
     }
 
-    h1 {
+    h1, h2 {
         text-align: center;
         font-size: 12pt;
+    }
+
+    h2 {
+        font-weight: normal;
     }
 
     .resultContainer div {
@@ -204,12 +208,16 @@
         "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("100001110001110001110001", 2), parseInt("000000110000110000110000", 2)],
     }];
 
-    function ConvertMaskToTable(res, q)
-    {
+    function ConvertMaskToTable(res, q, date) {
         var prev = -1;
         var line = "";
         var n = 0;
-        var output = "<div><h1>" + plans[q]["title"] + "</h1>";
+        const options = {
+            weekday: 'long',
+            // month: 'long',
+            // day: 'numeric',
+        };
+        var output = "<div><h1>" + plans[q]["title"] + "</h1><h2>" + date.toLocaleString('ru-RU', options) + "</h2>";
         for (var i = 0; i < 24; ++i, ++n) {
             if (prev != res[i]) {
                 if (prev != -1) {
@@ -229,7 +237,7 @@
 
         var output = "";
         for (var q = 0; q < 2; q++) {
-            
+
             var res = parseInt("111111111111111111111111", 2);
             var c = plans[q][$("#scheme").val()];
 
@@ -241,8 +249,8 @@
                 res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
             });
             res = res.toString(2).padStart(24, '0');
-            
-            output += ConvertMaskToTable(res, q);
+
+            output += ConvertMaskToTable(res, q, '');
         }
 
         $(".resultContainer").html(output);
@@ -333,21 +341,20 @@
                     var parser = new DOMParser();
                     var output = "";
                     var doc = parser.parseFromString(data.responseText, 'text/html');
-                    doc.querySelectorAll("tbody>tr").forEach((tr, i) => 
-                        { 
-                            if (i != 0 && i != 2)
+                    doc.querySelectorAll("tbody>tr").forEach((tr, i) => {
+                        if (i != 0 && i != 2)
+                            return;
+                        var res = "";
+                        tr.querySelectorAll("td").forEach((td, j) => {
+                            if (j % 2 !== 0 || j == 0)
                                 return;
-                            var res = "";
-                            tr.querySelectorAll("td").forEach((td, j) => {
-                                if(j % 2 !== 0 || j == 0)
-                                    return;
-                                res += td.className.includes("on") ? "1" : "0";
-                                
-                            });
-                            console.log(i + 1);
-                            output += ConvertMaskToTable(res, i % 3);
-                            console.log(res);
+                            res += td.className.includes("on") ? "1" : "0";
+
                         });
+                        console.log(i + 1);
+                        output += ConvertMaskToTable(res, i % 3, date);
+                        console.log(res);
+                    });
                     //console.log(doc.body);
                     $(".resultContainer").html(output);
                 } else {
