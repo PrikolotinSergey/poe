@@ -332,29 +332,36 @@
         // });
         $.ajax({
             //url: "https://www.poe.pl.ua/customs/newgpv-info.php",
-            url: "https://www.poe.pl.ua/customs/grafik-info.php",
+            url: "https://www.poe.pl.ua/customs/dynamicgpv-info.php",
             type: "post",
             dataType: "json",
-            data: { "seldate": JSON.stringify(datainfo) },
+            // data: { "seldate": JSON.stringify(datainfo) },
             complete: function(data) {
                 if (data.responseText) {
                     var parser = new DOMParser();
                     var output = "";
                     var doc = parser.parseFromString(data.responseText, 'text/html');
-                    doc.querySelectorAll("tbody>tr").forEach((tr, i) => {
-                        if (i != 0 && i != 2)
+                    doc.querySelectorAll("div[class='gpvinfodetail']").forEach((div)=>{
+                        var data = div.querySelectorAll("b[style='color: red;']");
+                        console.log(data[0].outerText);
+                        div.querySelectorAll("tbody>tr").forEach((tr, i) => {
+                        if (i != 0 && i != 4)
                             return;
                         var res = "";
                         tr.querySelectorAll("td").forEach((td, j) => {
                             if (j % 2 !== 0 || j == 0)
                                 return;
-                            res += td.className.includes("on") ? "1" : "0";
+                            res += td.className.includes("1") ? "1" : "0";
 
                         });
                         console.log(i + 1);
-                        output += ConvertMaskToTable(res, i % 3, date);
+                        output += ConvertMaskToTable(res, i / 2 % 3, date);
                         console.log(res);
                     });
+                    
+                    date = date.addDays(1);
+                    });
+                    
                     //console.log(doc.body);
                     $(".resultContainer").html(output);
                 } else {
