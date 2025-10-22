@@ -304,31 +304,18 @@
 
     function Copy() {
         var c = document.getElementsByClassName('resultContainer')[0];
-        domtoimage
-        .toPng(c)
-        .then(function (URL) {
-            document.getElementById("imageResult").setAttribute("src", URL);
+        domtoimage.toBlob(c, {
+          width: c.offsetWidth * 2,
+          height: c.offsetHeight * 2,
+          style: { transform: 'scale(2)', transformOrigin: 'top left'}})
+        .then(function (blob) 
+        {
+            navigator.clipboard.write([new ClipboardItem({"image/png": blob })])
+            //document.getElementById("imageResult").setAttribute("src", URL);
         })
         .catch(function (error) {
             console.error("error");
         });
-    
-        // html2canvas(c, {
-        //     onrendered: function(canvas) 
-        //     {
-        //         document.getElementById("imageResult").setAttribute("src", canvas.toDataURL())
-        //     // canvas.toBlob(blob => {
-        //     //     // Use Clipboard API to write the image to the clipboard
-        //     //     navigator.clipboard.write([
-        //     //         new ClipboardItem({ "image/png": blob })
-        //     //         ]).then(() => {
-        //     //             console.log("Image copied to clipboard!");
-        //     //         }).catch(err => {
-        //     //             console.error("Failed to copy image: ", err);
-        //     //         });
-        //     //     });
-        //     }
-        // });
     }
 
     function GetGPVForDate(date) {
