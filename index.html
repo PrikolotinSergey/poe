@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Poe Calculator</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" language="JavaScript"></script>
-    <script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" type="text/javascript"></script>
     <style type="text/css">
     body {
 
@@ -199,6 +199,7 @@
     <button onclick="Copy()">Copy result</button>
     <div class="resultContainer">
     </div>
+    <img id="imageResult" />
     <script type="text/javascript">
     var plans = [{
         "title": "1",
@@ -303,21 +304,31 @@
 
     function Copy() {
         var c = document.getElementsByClassName('resultContainer')[0];
-        html2canvas(c, {
-            onrendered: function(canvas) 
-            {
-            canvas.toBlob(blob => {
-                // Use Clipboard API to write the image to the clipboard
-                navigator.clipboard.write([
-                    new ClipboardItem({ "image/png": blob })
-                    ]).then(() => {
-                        console.log("Image copied to clipboard!");
-                    }).catch(err => {
-                        console.error("Failed to copy image: ", err);
-                    });
-                });
-            }
+        domtoimage
+        .toPng(c)
+        .then(function (URL) {
+            document.getElementById("imageResult").setAttribute("src", URL);
+        })
+        .catch(function (error) {
+            console.error("error");
         });
+    
+        // html2canvas(c, {
+        //     onrendered: function(canvas) 
+        //     {
+        //         document.getElementById("imageResult").setAttribute("src", canvas.toDataURL())
+        //     // canvas.toBlob(blob => {
+        //     //     // Use Clipboard API to write the image to the clipboard
+        //     //     navigator.clipboard.write([
+        //     //         new ClipboardItem({ "image/png": blob })
+        //     //         ]).then(() => {
+        //     //             console.log("Image copied to clipboard!");
+        //     //         }).catch(err => {
+        //     //             console.error("Failed to copy image: ", err);
+        //     //         });
+        //     //     });
+        //     }
+        // });
     }
 
     function GetGPVForDate(date) {
