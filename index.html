@@ -310,11 +310,12 @@
           style: { transform: 'scale(2)', transformOrigin: 'top left'}})
         .then(function (blob) 
         {
-            navigator.clipboard.write([new ClipboardItem({"image/png": blob })])
+            window.saveAs(blob, 'my-node.png');
+            //navigator.clipboard.write([new ClipboardItem({"image/png": blob })])
             //document.getElementById("imageResult").setAttribute("src", URL);
         })
         .catch(function (error) {
-            console.error("error");
+            console.error("error:" + error);
         });
     }
 
@@ -389,6 +390,25 @@
 
                     //console.log(doc.body);
                     $(".resultContainer").html(output);
+                    //-----------
+                    var c = document.getElementsByClassName('resultContainer')[0];
+                    domtoimage.toBlob(c, {
+                      width: c.offsetWidth * 2,
+                      height: c.offsetHeight * 2,
+                      style: { transform: 'scale(2)', transformOrigin: 'top left'}})
+                    .then(function (blob) 
+                    {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = "image.png";
+                        link.innerHTML = "download";
+                        document.body.appendChild(link);
+                    })
+                    .catch(function (error) {
+                        console.error("error:" + error);
+                    });
+                    
                 } else {
                     $("#data").html("<div class=\"gpvTable\"><b>Data is not available</b></div>");
                 }
