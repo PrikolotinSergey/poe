@@ -9,8 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" type="text/javascript"></script>
     <style type="text/css">
     body {
-
-        font-family: Helvetica, sans serif;
+        font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     }
 
     .no,
@@ -81,14 +80,23 @@
         width: 360px;
     }
 
+    h1
+    {
+        font-weight:600;
+    }
+
     h1,
     h2 {
+        color: #1d1d1f;
         text-align: center;
         font-size: 12pt;
+        margin: 0;
     }
 
     h2 {
         font-weight: normal;
+        font-weight: 400;
+        line-height: 24px;
     }
 
     .resultContainer div {
@@ -184,30 +192,17 @@
 </head>
 
 <body>
-    <label for="getGPVToday">Get GPV for </label>
-    <button id="getGPVToday">Today</button>
-    <button id="getGPVTomorrow">Tomorrow</button>
-    <label for="scheme">Power off scheme: </label>
-    <select id="scheme">
-        <option value="a">A</option>
-        <option value="b">B</option>
-        <option value="c">C</option>
-    </select>
-    <div id="data">
-    </div>
-    <button id=add>Add</button>
-    <button onclick="Copy()">Copy result</button>
     <div class="resultContainer">
     </div>
     <img id="imageResult" />
     <script type="text/javascript">
     var plans = [{
-        "title": "1",
+        "title": "Очередь 1",
         "a": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("100001110001110001110001", 2), parseInt("000000110000110000110001", 2)],
         "b": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2), parseInt("111100001100001100001100", 2)],
         "c": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2), parseInt("000011000011000011000011", 2)],
     }, {}, {
-        "title": "3",
+        "title": "Очередь 3",
         "a": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2), parseInt("111100001100001100001100", 2)],
         "b": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2), parseInt("111111000011000011000011", 2)],
         "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("100001110001110001110001", 2), parseInt("000000110000110000110000", 2)],
@@ -242,40 +237,40 @@
         return output;
     }
 
-    function Invalidate() {
+    // function Invalidate() {
 
-        var output = "";
-        for (var q = 0; q < 2; q++) {
+    //     var output = "";
+    //     for (var q = 0; q < 2; q++) {
 
-            var res = parseInt("111111111111111111111111", 2);
-            var c = plans[q][$("#scheme").val()];
+    //         var res = parseInt("111111111111111111111111", 2);
+    //         var c = plans[q][$("#scheme").val()];
 
-            $("#data").children(".row").each(function() {
-                var mask = Number(0);
-                $.each($(this).find("input[type='checkbox']:checked"), function() {
-                    mask = mask | 1 << (23 - Number($(this).val()));
-                });
-                res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
-            });
-            res = res.toString(2).padStart(24, '0');
+    //         $("#data").children(".row").each(function() {
+    //             var mask = Number(0);
+    //             $.each($(this).find("input[type='checkbox']:checked"), function() {
+    //                 mask = mask | 1 << (23 - Number($(this).val()));
+    //             });
+    //             res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
+    //         });
+    //         res = res.toString(2).padStart(24, '0');
 
-            output += ConvertMaskToTable(res, q, '');
-        }
+    //         output += ConvertMaskToTable(res, q, '');
+    //     }
 
-        $(".resultContainer").html(output);
-    }
-    $("#add").click(function() {
-        var values = parseInt("1111111111111111111111111", 2);
-        $.each($("#data input[type='checkbox']:checked"), function() {
-            values = values & ~(1 << (24 - Number($(this).val())));
-        });
-        values = values.toString(2).padStart(25, '0');
+    //     $(".resultContainer").html(output);
+    // }
+    // $("#add").click(function() {
+    //     var values = parseInt("1111111111111111111111111", 2);
+    //     $.each($("#data input[type='checkbox']:checked"), function() {
+    //         values = values & ~(1 << (24 - Number($(this).val())));
+    //     });
+    //     values = values.toString(2).padStart(25, '0');
 
-        addRow(0, values);
-        $(":checkbox").change(Invalidate);
-        $("select").change(Invalidate);
-        Invalidate();
-    });
+    //     addRow(0, values);
+    //     $(":checkbox").change(Invalidate);
+    //     $("select").change(Invalidate);
+    //     Invalidate();
+    // });
 
     function addRow(plan, values) {
         $("#data").append("<div class=\"row\"></div>");
@@ -290,12 +285,12 @@
             $("<label class=\"switch\"><input type=\"checkbox\" value=\"" + i + "\" " + (values[i] == '1' ? "checked=\"checked\"" : "") + "><span class=\"checkbox\">" + i.toString().padStart(2, '0') + "</span></label>").appendTo(item);
         }
     }
-    $("#getGPVToday").click(function() {
-        GetGPVForDate(new Date());
-    });
-    $("#getGPVTomorrow").click(function() {
-        GetGPVForDate(new Date().addDays(1));
-    });
+    // $("#getGPVToday").click(function() {
+    //     GetGPVForDate(new Date());
+    // });
+    // $("#getGPVTomorrow").click(function() {
+    //     GetGPVForDate(new Date().addDays(1));
+    // });
     Date.prototype.addDays = function(days) {
         const date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -401,8 +396,9 @@
                         const url = URL.createObjectURL(blob);
                         const link = document.createElement("a");
                         link.href = url;
+                        link.target = '_blank';
                         link.download = "image.png";
-                        link.innerHTML = "download";
+                        link.textContent = "download";
                         document.body.appendChild(link);
                     })
                     .catch(function (error) {
@@ -415,6 +411,7 @@
             }
         });
     }
+    GetGPVForDate(new Date());
     </script>
 </body>
 
