@@ -42,7 +42,7 @@
         .no:after {
             display: inline-block;
             text-align: center;
-            width: 28px;
+            width: 38px;
             line-height: 32px;
             position: absolute;
             right: 0;
@@ -76,7 +76,7 @@
             margin: 10px 10px 50px 10px;
             display: grid;
             gap: 25px;
-            grid-template-columns: 155px 155px;
+            grid-template-columns: 165px 165px;
         }
 
         h1,
@@ -96,7 +96,7 @@
 
         .resultContainer span {
             display: inline-block;
-            width: 155px;
+            width: 165px;
         }
 
         #result {
@@ -350,7 +350,7 @@
                         doc.querySelectorAll("div[class='gpvinfodetail']").forEach((div) => 
                         {
                             var data = div.querySelectorAll("b[style='color: red;']");
-                            console.log(data[0].outerText);
+                            console.log(data[0]?.outerText);
                             div.querySelectorAll("tbody>tr").forEach((tr, i) => 
                             {
                                 if (i != 0 && i != 4)
