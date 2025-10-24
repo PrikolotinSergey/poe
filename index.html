@@ -13,7 +13,8 @@
     }
 
     .no,
-    .yes {
+    .yes,
+    .uncertain {
         display: inline-block;
         padding-right: 5px;
         position: relative;
@@ -29,8 +30,14 @@
         color: #583300;
     }
 
+    .uncertain {
+        background: repeating-linear-gradient(55deg, #FDDC4F, #FDDC4F 10px, #FEE7AA 10px, #FEE7AA 20px);
+        color: #583300;
+    }
+
     .yes:before,
-    .no:before {
+    .no:before,
+    .uncertain:before {
         display: inline-block;
         line-height: 32px;
         text-align: center;
@@ -39,7 +46,8 @@
     }
 
     .yes:after,
-    .no:after {
+    .no:after,
+    .uncertain:after {
         display: inline-block;
         text-align: center;
         width: 38px;
@@ -61,6 +69,13 @@
         border-left: 1px solid #A9A9AE;
     }
 
+    .uncertain:after {
+        background: #FFECD080;
+        color: #DF9500;
+        border-left: 1px solid #DF9500;
+    }
+
+
     .yes:before {
         content: '💡';
         background: #FF9500;
@@ -70,6 +85,11 @@
         content: '╳';
         color: #79797E;
         background: #D3D3D5;
+    }
+
+    .uncertain:before {
+        content: '🎲';
+        background: #FF950080;
     }
 
     .resultContainer {
@@ -226,7 +246,7 @@
             if (prev != res[i]) {
                 if (prev != -1) {
                     line += FormatTime(i);
-                    output += "<span class=\"" + (prev == '1' ? "yes" : "no") + "\" data-count=\"" + (n / 2) + "\">" + line + "</span><br>";
+                    output += "<span class=\"" + (prev == '1' ? "yes" : prev == '~' ? "uncertain" : "no") + "\" data-count=\"" + (n / 2) + "\">" + line + "</span><br>";
                     n = 0;
                 }
                 line = FormatTime(i) + " - ";
@@ -372,7 +392,7 @@
                             tr.querySelectorAll("td").forEach((td, j) => {
                                 if (!td.className.includes("light_"))
                                     return;
-                                res += td.className.includes("2") ? "0" : "1"; // light_1 - On, light_2 - Off, light_3 - Intermediate
+                                res += td.className.includes("2") ? "0" : td.className.includes("3") ? "~" : "1"; // light_1 - On, light_2 - Off, light_3 - Intermediate
 
                             });
                             console.log(i + 1);
