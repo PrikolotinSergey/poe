@@ -253,7 +253,7 @@
                 prev = res[i];
             }
         }
-        output += "<span class=\"" + (prev == '1' ? "yes" : "no") + "\" data-count=\"" + (n / 2) + "\">" + line + FormatTime(i) + "</span></div>";
+        output += "<span class=\"" + (prev == '1' ? "yes" : prev == '~' ? "uncertain" : "no") + "\" data-count=\"" + (n / 2) + "\">" + line + FormatTime(i) + "</span></div>";
         return output;
     }
 
