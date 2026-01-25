@@ -82,7 +82,8 @@
     }
 
     .no:before {
-        content: '╳';
+        content: '💡';
+        filter: grayscale(100%) contrast(110%);
         color: #79797E;
         background: #D3D3D5;
     }
@@ -241,7 +242,8 @@
             // month: 'long',
             // day: 'numeric',
         };
-        var output = "<div><h1>" + plans[q]["title"] + "</h1><h2>" + date.toLocaleString('ru-RU', options) + "</h2>";
+
+        var output = "<div><h1>" + plans[q]["title"] + "</h1><h2>" + date.toLocaleString('ru-RU', options) + "<br>💡: " + res.replaceAll('0', '').length / 2 + " <b style='filter: grayscale(100%)'>💡:</b> " + res.replaceAll('1', '').replaceAll('~', '').length / 2 + "</h2>";
         for (var i = 0; i < 24 * 2; ++i, ++n) {
             if (prev != res[i]) {
                 if (prev != -1) {
