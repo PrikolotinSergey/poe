@@ -97,8 +97,7 @@
         padding: 20px;
         display: grid;
         gap: 25px;
-        grid-template-columns: 1fr 1fr;
-        width: 360px;
+        grid-template-columns: 170px 170px 170px;
     }
 
     h1
@@ -215,20 +214,8 @@
 <body>
     <div class="resultContainer">
     </div>
-    <img id="imageResult" />
+    <p><a href="https://www.poe.pl.ua/customs/dynamicgpv-info.php" target="blanc">Полтава облэнерго</a></p>
     <script type="text/javascript">
-    var plans = [{
-        "title": "Очередь 1",
-        "a": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("100001110001110001110001", 2), parseInt("000000110000110000110001", 2)],
-        "b": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2), parseInt("111100001100001100001100", 2)],
-        "c": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2), parseInt("000011000011000011000011", 2)],
-    }, {}, {
-        "title": "Очередь 3",
-        "a": [parseInt("111101111101111101111101", 2), parseInt("111100111100111100111100", 2), parseInt("111100011100011100011100", 2), parseInt("111100001100001100001100", 2)],
-        "b": [parseInt("111111011111011111011111", 2), parseInt("111111001111001111001111", 2), parseInt("000111000111000111000111", 2), parseInt("111111000011000011000011", 2)],
-        "c": [parseInt("000111110111110111110111", 2), parseInt("000011110011110011110011", 2), parseInt("100001110001110001110001", 2), parseInt("000000110000110000110000", 2)],
-    }];
-
     function FormatTime(t) {
         return "" + (Math.floor(t / 2)).toString().padStart(2, '0') + ":" + (t % 2 ? "30" : "00");
     }
@@ -243,7 +230,7 @@
             // day: 'numeric',
         };
 
-        var output = "<div><h1>" + plans[q]["title"] + "</h1><h2>" + date.toLocaleString('ru-RU', options) + "<br>💡: " + res.replaceAll('0', '').length / 2 + " <b style='filter: grayscale(100%)'>💡:</b> " + res.replaceAll('1', '').replaceAll('~', '').length / 2 + "</h2>";
+        var output = "<div><h1>Очередь " + (Math.floor(q / 2) + 1) + "." + (q % 2 + 1) + "</h1><h2>" + date.toLocaleString('ru-RU', options) + "<br>💡: " + res.replaceAll('0', '').length / 2 + " <b style='filter: grayscale(100%)'>💡:</b> " + res.replaceAll('1', '').replaceAll('~', '').length / 2 + "</h2>";
         for (var i = 0; i < 24 * 2; ++i, ++n) {
             if (prev != res[i]) {
                 if (prev != -1) {
@@ -258,41 +245,6 @@
         output += "<span class=\"" + (prev == '1' ? "yes" : prev == '~' ? "uncertain" : "no") + "\" data-count=\"" + (n / 2) + "\">" + line + FormatTime(i) + "</span></div>";
         return output;
     }
-
-    // function Invalidate() {
-
-    //     var output = "";
-    //     for (var q = 0; q < 2; q++) {
-
-    //         var res = parseInt("111111111111111111111111", 2);
-    //         var c = plans[q][$("#scheme").val()];
-
-    //         $("#data").children(".row").each(function() {
-    //             var mask = Number(0);
-    //             $.each($(this).find("input[type='checkbox']:checked"), function() {
-    //                 mask = mask | 1 << (23 - Number($(this).val()));
-    //             });
-    //             res = res & (~mask | (c[Number($(this).find("select").val())] & mask));
-    //         });
-    //         res = res.toString(2).padStart(24, '0');
-
-    //         output += ConvertMaskToTable(res, q, '');
-    //     }
-
-    //     $(".resultContainer").html(output);
-    // }
-    // $("#add").click(function() {
-    //     var values = parseInt("1111111111111111111111111", 2);
-    //     $.each($("#data input[type='checkbox']:checked"), function() {
-    //         values = values & ~(1 << (24 - Number($(this).val())));
-    //     });
-    //     values = values.toString(2).padStart(25, '0');
-
-    //     addRow(0, values);
-    //     $(":checkbox").change(Invalidate);
-    //     $("select").change(Invalidate);
-    //     Invalidate();
-    // });
 
     function addRow(plan, values) {
         $("#data").append("<div class=\"row\"></div>");
@@ -388,7 +340,7 @@
                         var data = div.querySelectorAll("b[style='color: red;']");
                         console.log(data[0]?.outerText);
                         div.querySelectorAll("tbody>tr").forEach((tr, i) => {
-                            if (i != 0 && i != 4)
+                            if (i != 0 && i != 4 && i != 11)
                                 return;
                             var res = "";
                             tr.querySelectorAll("td").forEach((td, j) => {
@@ -398,7 +350,7 @@
 
                             });
                             console.log(i + 1);
-                            output += ConvertMaskToTable(res, i / 2 % 3, date);
+                            output += ConvertMaskToTable(res, i, date);
                             console.log(res);
                         });
 
