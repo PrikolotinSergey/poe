@@ -97,7 +97,7 @@
         padding: 20px;
         display: grid;
         gap: 25px;
-        grid-template-columns: 170px 170px 170px;
+        /*grid-template-columns: 170px 170px 170px;*/
     }
 
     h1
@@ -336,11 +336,12 @@
                     var parser = new DOMParser();
                     var output = "";
                     var doc = parser.parseFromString(data.responseText, 'text/html');
+                    var plans = [0, 4/*, 11*/];
                     doc.querySelectorAll("div[class='gpvinfodetail']").forEach((div) => {
                         var data = div.querySelectorAll("b[style='color: red;']");
                         console.log(data[0]?.outerText);
                         div.querySelectorAll("tbody>tr").forEach((tr, i) => {
-                            if (i != 0 && i != 4 && i != 11)
+                            if (!plans.includes(i))
                                 return;
                             var res = "";
                             tr.querySelectorAll("td").forEach((td, j) => {
@@ -359,6 +360,7 @@
 
                     //console.log(doc.body);
                     $(".resultContainer").html(output);
+                    $(".resultContainer").css("grid-template-columns", `${"170px ".repeat(plans.length)}`);
                     //-----------
                     var c = document.getElementsByClassName('resultContainer')[0];
                     domtoimage.toBlob(c, {
