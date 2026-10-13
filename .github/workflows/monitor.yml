@@ -29,37 +29,18 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      
-      - name: Diagnose POE network access
+        
+      - name: Test each POE server IP
         run: |
-          set +e
-
-          echo "=== DNS ==="
-          getent ahosts www.poe.pl.ua
-          getent ahosts poe.pl.ua
-
-          echo "=== IPv4 / IPv6 ==="
-          for url in \
-            https://www.poe.pl.ua/ \
-            https://poe.pl.ua/ \
-            http://www.poe.pl.ua/ \
-            https://www.poe.pl.ua/customs/dynamicgpv-info.php
-          do
-            echo
-            echo "Testing: $url"
-
-            curl -4 -sS -o /dev/null \
-              --connect-timeout 8 --max-time 12 \
-              -w "IPv4 HTTP=%{http_code} IP=%{remote_ip}\n" \
-              "$url"
-            echo "IPv4 exit code: $?"
-
-            curl -6 -sS -o /dev/null \
-              --connect-timeout 8 --max-time 12 \
-              -w "IPv6 HTTP=%{http_code} IP=%{remote_ip}\n" \
-              "$url"
-            echo "IPv6 exit code: $?"
+          for ip in 194.44.38.147 95.164.67.38; do
+            echo "=== Testing $ip ==="
+            curl -4 -v \
+              --connect-timeout 8 \
+              --max-time 12 \
+              --resolve www.poe.pl.ua:443:$ip \
+              https://www.poe.pl.ua/ \
+              -o /dev/null
+            echo "Exit code: $?"
           done
 
       - name: Check schedule and notify
