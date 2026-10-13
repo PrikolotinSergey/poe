@@ -30,39 +30,37 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Diagnose source connectivity
+      
+      - name: Diagnose POE network access
         run: |
-          python - <<'PY'
-          import requests
+          set +e
 
-          urls = [
-              "https://www.poe.pl.ua/",
-              "https://www.poe.pl.ua/customs/dynamicgpv-info.php",
-          ]
+          echo "=== DNS ==="
+          getent ahosts www.poe.pl.ua
+          getent ahosts poe.pl.ua
 
-          for url in urls:
-              print(f"\nTesting {url}")
-              try:
-                  if url.endswith(".php"):
-                      response = requests.post(
-                          url,
-                          headers={
-                              "User-Agent": "Mozilla/5.0",
-                              "Referer": "https://prikolotinsergey.github.io/poe/",
-                          },
-                          timeout=(10, 15),
-                      )
-                  else:
-                      response = requests.get(
-                          url,
-                          timeout=(10, 15),
-                      )
+          echo "=== IPv4 / IPv6 ==="
+          for url in \
+            https://www.poe.pl.ua/ \
+            https://poe.pl.ua/ \
+            http://www.poe.pl.ua/ \
+            https://www.poe.pl.ua/customs/dynamicgpv-info.php
+          do
+            echo
+            echo "Testing: $url"
 
-                  print("HTTP:", response.status_code)
-                  print("Bytes:", len(response.content))
-              except requests.RequestException as exc:
-                  print(type(exc).__name__, str(exc))
-          PY
+            curl -4 -sS -o /dev/null \
+              --connect-timeout 8 --max-time 12 \
+              -w "IPv4 HTTP=%{http_code} IP=%{remote_ip}\n" \
+              "$url"
+            echo "IPv4 exit code: $?"
+
+            curl -6 -sS -o /dev/null \
+              --connect-timeout 8 --max-time 12 \
+              -w "IPv6 HTTP=%{http_code} IP=%{remote_ip}\n" \
+              "$url"
+            echo "IPv6 exit code: $?"
+          done
 
       - name: Check schedule and notify
         env:
