@@ -30,6 +30,40 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Diagnose source connectivity
+        run: |
+          python - <<'PY'
+          import requests
+
+          urls = [
+              "https://www.poe.pl.ua/",
+              "https://www.poe.pl.ua/customs/dynamicgpv-info.php",
+          ]
+
+          for url in urls:
+              print(f"\nTesting {url}")
+              try:
+                  if url.endswith(".php"):
+                      response = requests.post(
+                          url,
+                          headers={
+                              "User-Agent": "Mozilla/5.0",
+                              "Referer": "https://prikolotinsergey.github.io/poe/",
+                          },
+                          timeout=(10, 15),
+                      )
+                  else:
+                      response = requests.get(
+                          url,
+                          timeout=(10, 15),
+                      )
+
+                  print("HTTP:", response.status_code)
+                  print("Bytes:", len(response.content))
+              except requests.RequestException as exc:
+                  print(type(exc).__name__, str(exc))
+          PY
+
       - name: Check schedule and notify
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
