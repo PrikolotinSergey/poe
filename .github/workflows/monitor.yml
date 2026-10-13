@@ -31,17 +31,20 @@ jobs:
         run: pip install -r requirements.txt
         
       - name: Test each POE server IP
+        shell: bash
         run: |
           for ip in 194.44.38.147 95.164.67.38; do
             echo "=== Testing $ip ==="
             curl -4 -v \
               --connect-timeout 8 \
               --max-time 12 \
-              --resolve www.poe.pl.ua:443:$ip \
+              --resolve "www.poe.pl.ua:443:$ip" \
               https://www.poe.pl.ua/ \
               -o /dev/null
-            echo "Exit code: $?"
+            rc=$?
+            echo "Exit code for $ip: $rc"
           done
+          echo "=== All tests completed ==="
 
       - name: Check schedule and notify
         env:
