@@ -30,29 +30,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      - name: Test alternative Ukrainian proxies
-        shell: bash
-        run: |
-          for proxy in \
-            46.150.9.111:8123 \
-            31.148.207.153:80 \
-            176.101.220.90:8090
-          do
-            echo "=== Testing proxy $proxy ==="
-      
-            curl -sS -v \
-              --proxy "http://$proxy" \
-              --connect-timeout 5 \
-              --max-time 12 \
-              -o /dev/null \
-              -w '\nHTTP status: %{http_code}\n' \
-              https://www.poe.pl.ua/
-      
-            echo "Exit code: $?"
-          done
-      
-          echo "=== Tests completed ==="
-
       - name: Check schedule and notify
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
