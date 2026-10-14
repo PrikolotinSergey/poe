@@ -3,12 +3,16 @@ import json
 import os
 import re
 import sys
+import warnings
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import requests
 from bs4 import BeautifulSoup
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 SOURCE_URL = (
@@ -30,8 +34,39 @@ STATUS = {
 }
 
 
+def make_insecure_session():
+    """Создать Session с ретраями и (временно) без проверки сертификатов.
+
+    Это обходная мера: отключаем проверку TLS (verify=False) и подавляем
+    InsecureRequestWarning, потому что целевой сервер возвращает некорректную
+    информацию об отзыве сертификата (OCSP/CRL). Использовать только для
+    публичного HTML, не для передачи секретов.
+    """
+    # Подавляем предупреждение о небезопасном соединении — оно информативно,
+    # но загромождает логи в CI.
+    warnings.simplefilter("ignore", InsecureRequestWarning)
+
+    session = requests.Session()
+    retry = Retry(
+        total=4,
+        connect=4,
+        read=4,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=None,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
+
 def fetch_html():
-    """Получить HTML тем же POST-запросом, что использует сайт."""
+    """Получить HTML тем же POST-запросом, что использует сайт.
+
+    Временно выполняем запрос с verify=False и ретраями, чтобы обойти
+    проблемы с проверкой отзыва сертификата на стороне сервера/CA.
+    """
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; POEMonitor/1.0)",
         "Referer": PAGE_URL,
@@ -39,12 +74,15 @@ def fetch_html():
         "Content-Type": "application/x-www-form-urlencoded",
     }
 
+    session = make_insecure_session()
+
     try:
-        response = requests.post(
+        response = session.post(
             SOURCE_URL,
             headers=headers,
             data={},
-            timeout=(10, 30),
+            timeout=(20, 50),
+            verify=False,
         )
     except requests.exceptions.RequestException as exc:
         print(f"Ошибка запроса к {SOURCE_URL}: {exc}", file=sys.stderr)
@@ -107,7 +145,7 @@ def format_time(slot):
 
 
 def format_schedule(mask):
-    """Сгруппировать сосе��ние интервалы с одинаковым состоянием."""
+    """Сгруппировать соседние интервалы с одинаковым состоянием."""
     intervals = []
     start = 0
 
