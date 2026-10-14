@@ -1,4 +1,3 @@
-
 import hashlib
 import json
 import os
@@ -33,18 +32,42 @@ STATUS = {
 
 def fetch_html():
     """Получить HTML тем же POST-запросом, что использует сайт."""
-    response = requests.post(
-        SOURCE_URL,
-        headers={
-            "User-Agent": "Mozilla/5.0 (compatible; POEMonitor/1.0)",
-            "Referer": PAGE_URL,
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        timeout=(10, 30),
-    )
-    response.raise_for_status()
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; POEMonitor/1.0)",
+        "Referer": PAGE_URL,
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    try:
+        response = requests.post(
+            SOURCE_URL,
+            headers=headers,
+            data={},
+            timeout=(10, 30),
+        )
+    except requests.exceptions.RequestException as exc:
+        print(f"Ошибка запроса к {SOURCE_URL}: {exc}", file=sys.stderr)
+        raise
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as exc:
+        body_preview = (
+            (response.text[:1000] + "...") if response.text else "<empty>"
+        )
+        print(
+            f"HTTP error {response.status_code} from {SOURCE_URL}: {exc}",
+            file=sys.stderr,
+        )
+        print("Response body preview:", body_preview, file=sys.stderr)
+        raise
 
     if not response.text.strip():
+        print("Пустой ответ от источника:", file=sys.stderr)
+        print("Status:", response.status_code, file=sys.stderr)
+        print("Headers:", response.headers, file=sys.stderr)
+        print("Body length:", len(response.text), file=sys.stderr)
         raise RuntimeError("Источник вернул пустой ответ")
 
     return response.text
