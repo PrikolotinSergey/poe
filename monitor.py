@@ -15,7 +15,7 @@ SOURCE_URL = (
     "https://www.poe.pl.ua/customs/dynamicgpv-info.php"
 )
 PAGE_URL = "https://prikolotinsergey.github.io/poe/"
-STATE_FILE = Path("monitor_state.json")
+STATE_FILE = Path(os.environ.get("STATE_FILE", "monitor_state.json"))
 KYIV = ZoneInfo("Europe/Kyiv")
 
 # Соответствует очередям, которые показывает index.html:
@@ -107,7 +107,7 @@ def format_time(slot):
 
 
 def format_schedule(mask):
-    """Сгруппировать соседние интервалы с одинаковым состоянием."""
+    """Сгруппировать сосе��ние интервалы с одинаковым состоянием."""
     intervals = []
     start = 0
 
@@ -267,6 +267,7 @@ def save_state(digest, schedule):
         "schedule": schedule,
         "checked_at": datetime.now(KYIV).isoformat(),
     }
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(
         json.dumps(data, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
