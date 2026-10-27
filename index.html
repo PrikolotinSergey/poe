@@ -337,15 +337,15 @@
                     var output = "";
                     var doc = parser.parseFromString(data.responseText, 'text/html');
                     var plans = [0, 4/*, 11*/];
-                    doc.querySelectorAll("div[class='gpvinfodetail']").forEach((div) => {
-                        var data = div.querySelectorAll("b[style='color: red;']");
-                        console.log(data[0]?.outerText);
-                        div.querySelectorAll("tbody>tr").forEach((tr, i) => {
+                    doc.querySelectorAll("table[class='gpv-table']").forEach((table) => {
+                        //var data = div.querySelectorAll("td[class='gpv-s1']");
+                        //console.log(data[0]?.outerText);
+                        table.querySelectorAll("tbody>tr").forEach((tr, i) => {
                             if (!plans.includes(i))
                                 return;
                             var res = "";
                             tr.querySelectorAll("td").forEach((td, j) => {
-                                if (!td.className.includes("light_"))
+                                if (!td.className.includes("gpv-s"))
                                     return;
                                 res += td.className.includes("2") ? "0" : td.className.includes("3") ? "~" : "1"; // light_1 - On, light_2 - Off, light_3 - Intermediate
 
